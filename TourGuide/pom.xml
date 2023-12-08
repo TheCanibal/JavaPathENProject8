@@ -47,7 +47,7 @@
 			<scope>test</scope>
 		</dependency>
 
-		<dependency>
+	<dependency>
 			<groupId>gpsUtil</groupId>
 			<artifactId>gpsUtil</artifactId>
 			<version>1.0.0</version>
