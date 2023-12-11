@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
+import java.util.TreeMap;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -17,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import com.openclassrooms.tourguide.dto.ClosestFiveAttractions;
 import com.openclassrooms.tourguide.helper.InternalTestHelper;
 import com.openclassrooms.tourguide.tracker.Tracker;
 import com.openclassrooms.tourguide.user.User;
@@ -26,6 +28,7 @@ import gpsUtil.GpsUtil;
 import gpsUtil.location.Attraction;
 import gpsUtil.location.Location;
 import gpsUtil.location.VisitedLocation;
+import rewardCentral.RewardCentral;
 import tripPricer.Provider;
 import tripPricer.TripPricer;
 
@@ -95,14 +98,107 @@ public class TourGuideService {
     }
 
     public List<Attraction> getNearByAttractions(VisitedLocation visitedLocation) {
-        List<Attraction> nearbyAttractions = new ArrayList<>();
+        // List of five closest attractions
+        List<Attraction> fiveClosestAttractions = new ArrayList<>();
+        // all attractions around user, sort by ascending order
+        Map<Double, Attraction> allDistancesAttractions = new TreeMap<>();
+        // Five closest attractions and their distance
+        Map<Double, Attraction> fiveClosestDistancesAttractions = new HashMap<>();
+        int attractionNumber = 0;
+        RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
+        // set buffer to get all attractions whatever is the distance
+        rewardsService.setProximityBuffer(Integer.MAX_VALUE);
+        // for all attractions, put all attractions's distance and all attractions in a
+        // map
         for (Attraction attraction : gpsUtil.getAttractions()) {
-            if (rewardsService.isWithinAttractionProximity(attraction, visitedLocation.location)) {
-                nearbyAttractions.add(attraction);
+            allDistancesAttractions.put(rewardsService.getDistance(attraction, visitedLocation.location), attraction);
+        }
+        // for all attractions in all attractions map, put five closest attractions in
+        // another map
+        for (Map.Entry<Double, Attraction> mapEntry : allDistancesAttractions.entrySet()) {
+            if (attractionNumber < 5) {
+                fiveClosestDistancesAttractions.put(mapEntry.getKey(), mapEntry.getValue());
+                attractionNumber++;
             }
         }
+        // for the five closest attractions, separate the distances and the attractions
+        // in two different list to be able to access informations
+        for (Map.Entry<Double, Attraction> mapEntry : fiveClosestDistancesAttractions.entrySet()) {
+            fiveClosestAttractions.add(mapEntry.getValue());
+        }
+        return fiveClosestAttractions;
+    }
 
-        return nearbyAttractions;
+    public List<Double> getNearByAttractionsDistances(VisitedLocation visitedLocation) {
+        // List of five closest distances
+        List<Double> fiveClosestDistances = new ArrayList<>();
+        // all attractions around user, sort by ascending order
+        Map<Double, Attraction> allDistancesAttractions = new TreeMap<>();
+        // Five closest attractions and their distance
+        Map<Double, Attraction> fiveClosestDistancesAttractions = new HashMap<>();
+        int attractionNumber = 0;
+        RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
+        // set buffer to get all attractions whatever is the distance
+        rewardsService.setProximityBuffer(Integer.MAX_VALUE);
+        // for all attractions, put all attractions's distance and all attractions in a
+        // map
+        for (Attraction attraction : gpsUtil.getAttractions()) {
+            allDistancesAttractions.put(rewardsService.getDistance(attraction, visitedLocation.location), attraction);
+        }
+        // for all attractions in all attractions map, put five closest attractions in
+        // another map
+        for (Map.Entry<Double, Attraction> mapEntry : allDistancesAttractions.entrySet()) {
+            if (attractionNumber < 5) {
+                fiveClosestDistancesAttractions.put(mapEntry.getKey(), mapEntry.getValue());
+                attractionNumber++;
+            }
+        }
+        // for the five closest attractions, separate the distances and the attractions
+        // in two different list to be able to access informations
+        for (Map.Entry<Double, Attraction> mapEntry : fiveClosestDistancesAttractions.entrySet()) {
+            fiveClosestDistances.add(mapEntry.getKey());
+        }
+        return fiveClosestDistances;
+    }
+
+    public List<ClosestFiveAttractions> getFiveClosestAttractions(VisitedLocation visitedLocation) {
+        // List of five closest attractions
+        List<Attraction> fiveClosestAttractions = getNearByAttractions(visitedLocation);
+        // List of five closest distances
+        List<Double> fiveClosestDistances = getNearByAttractionsDistances(visitedLocation);
+        // List of five closest attractions to display
+        List<ClosestFiveAttractions> closestFiveAttractions = new ArrayList<>();
+        int distanceNumber = 0;
+        int rewardPoints = 0;
+        RewardCentral rewardCentral = new RewardCentral();
+        RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
+        // set buffer to get all attractions whatever is the distance
+        rewardsService.setProximityBuffer(Integer.MAX_VALUE);
+        // for each five attractions in the five closest attractions list
+        for (Attraction attraction : fiveClosestAttractions) {
+            // create new ClosestFiveAttractions object
+            ClosestFiveAttractions fiveAttractions = new ClosestFiveAttractions();
+            // Create new attractions map String Object to show name, latitude and longitude
+            Map<String, Object> attractions = new HashMap<>();
+            // Create new userLocation map to show user's latitude and longitude
+            Map<String, Double> userLocation = new HashMap<>();
+            // Put all necessary informations to display
+            attractions.put("name", attraction.attractionName);
+            attractions.put("latitude", attraction.latitude);
+            attractions.put("longitude", attraction.longitude);
+            userLocation.put("latitude", visitedLocation.location.latitude);
+            userLocation.put("longitude", visitedLocation.location.longitude);
+            rewardPoints = rewardCentral.getAttractionRewardPoints(attraction.attractionId, visitedLocation.userId);
+            // Then set value of each attribute in ClosestFiveAttraction POJO
+            fiveAttractions.setAttractionNameLatLong(attractions);
+            fiveAttractions.setDistanceBetween(fiveClosestDistances.get(distanceNumber));
+            fiveAttractions.setUserLocation(userLocation);
+            fiveAttractions.setRewardPoints(rewardPoints);
+            distanceNumber++;
+            // Finally add each attraction information
+            closestFiveAttractions.add(fiveAttractions);
+        }
+        return closestFiveAttractions;
     }
 
     private void addShutDownHook() {
