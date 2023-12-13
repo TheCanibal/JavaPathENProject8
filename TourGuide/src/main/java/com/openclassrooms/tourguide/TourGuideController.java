@@ -2,6 +2,7 @@ package com.openclassrooms.tourguide;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,7 +32,7 @@ public class TourGuideController {
     }
 
     @RequestMapping("/getLocation")
-    public VisitedLocation getLocation(@RequestParam String userName) {
+    public VisitedLocation getLocation(@RequestParam String userName) throws InterruptedException, ExecutionException {
         return tourGuideService.getUserLocation(getUser(userName));
     }
 
@@ -54,7 +55,8 @@ public class TourGuideController {
      */
 
     @RequestMapping("/testGetNearbyAttractions")
-    public List<ClosestFiveAttractions> getNearbyAttractions(@RequestParam String userName) {
+    public List<ClosestFiveAttractions> getNearbyAttractions(@RequestParam String userName)
+            throws InterruptedException, ExecutionException {
         List<ClosestFiveAttractions> closestFiveAttractions = new ArrayList<>();
         User user = getUser(userName);
         VisitedLocation visitedLocation = tourGuideService.getUserLocation(user);

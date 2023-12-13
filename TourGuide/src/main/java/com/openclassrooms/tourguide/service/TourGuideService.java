@@ -11,6 +11,9 @@ import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -40,6 +43,7 @@ public class TourGuideService {
     private final TripPricer tripPricer = new TripPricer();
     public final Tracker tracker;
     boolean testMode = true;
+    ExecutorService executor = Executors.newFixedThreadPool(38);
 
     public TourGuideService(GpsUtil gpsUtil, RewardsService rewardsService) {
         this.gpsUtil = gpsUtil;
@@ -88,6 +92,10 @@ public class TourGuideService {
                 user.getUserPreferences().getTripDuration(), cumulatativeRewardPoints);
         user.setTripDeals(providers);
         return providers;
+    }
+
+    public Future<VisitedLocation> trackUserLocationAsync(User user) {
+        return executor.submit(() -> trackUserLocation(user));
     }
 
     public VisitedLocation trackUserLocation(User user) {

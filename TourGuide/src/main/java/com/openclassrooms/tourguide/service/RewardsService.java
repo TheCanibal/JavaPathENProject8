@@ -2,6 +2,10 @@ package com.openclassrooms.tourguide.service;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.springframework.stereotype.Service;
 
@@ -24,6 +28,7 @@ public class RewardsService {
     private int attractionProximityRange = 200;
     private final GpsUtil gpsUtil;
     private final RewardCentral rewardsCentral;
+    ExecutorService executor = Executors.newFixedThreadPool(38);
 
     public RewardsService(GpsUtil gpsUtil, RewardCentral rewardCentral) {
         this.gpsUtil = gpsUtil;
@@ -53,6 +58,11 @@ public class RewardsService {
                 }
             }
         }
+    }
+
+    public void calculateRewardsAsync(User user) throws InterruptedException, ExecutionException {
+        Future<?> future = executor.submit(() -> calculateRewards(user));
+        future.get();
     }
 
     public boolean isWithinAttractionProximity(Attraction attraction, Location location) {
