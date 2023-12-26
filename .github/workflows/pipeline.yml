@@ -55,4 +55,4 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: artifact
-        path: ./target/tourguide-0.0.1-SNAPSHOT.jar
+        path: ./TourGuide/target/tourguide-0.0.1-SNAPSHOT.jar
