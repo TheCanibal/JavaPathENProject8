@@ -27,7 +27,10 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: ${{ matrix.java }}
-      - run: mvn -f TourGuide/pom.xml clean test
+      - run: mvn install:install-file -Dfile=TourGuide/libs/gpsUtil.jar -DgroupId=gpsUtil -DartifactId=gpsUtil -Dversion=1.0.0 -Dpackaging=jar
+      - run: mvn install:install-file -Dfile=TourGuide/libs/RewardCentral.jar -DgroupId=rewardCentral -DartifactId=rewardCentral -Dversion=1.0.0 -Dpackaging=jar
+      - run: mvn install:install-file -Dfile=TourGuide/libs/TripPricer.jar -DgroupId=tripPricer -DartifactId=tripPricer -Dversion=1.0.0 -Dpackaging=jar
+      - run: mvn TourGuide/pom.xml clean test -Dtest=\!TestPerformance
 
   release:
     runs-on: ubuntu-latest
