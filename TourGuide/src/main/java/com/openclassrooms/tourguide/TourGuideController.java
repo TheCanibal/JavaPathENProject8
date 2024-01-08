@@ -31,30 +31,30 @@ public class TourGuideController {
         return "Greetings from TourGuide!";
     }
 
+    /**
+     * get user's location lat and long
+     * 
+     * @param userName
+     * @return user's location
+     * @throws InterruptedException
+     * @throws ExecutionException
+     */
+
     @RequestMapping("/getLocation")
     public VisitedLocation getLocation(@RequestParam String userName) throws InterruptedException, ExecutionException {
         return tourGuideService.getUserLocation(getUser(userName));
     }
 
-    // TODO: Change this method to no longer return a List of Attractions.
-    // Instead: Get the closest five tourist attractions to the user - no matter how
-    // far away they are.
-    // Return a new JSON object that contains:
-    // Name of Tourist attraction,
-    // Tourist attractions lat/long,
-    // The user's location lat/long,
-    // The distance in miles between the user's location and each of the
-    // attractions.
-    // The reward points for visiting each Attraction.
-    // Note: Attraction reward points can be gathered from RewardsCentral
-    /*
-     * @RequestMapping("/getNearbyAttractions") public List<Attraction>
-     * getNearbyAttractions(@RequestParam String userName) { VisitedLocation
-     * visitedLocation = tourGuideService.getUserLocation(getUser(userName)); return
-     * tourGuideService.getNearByAttractions(visitedLocation); }
+    /**
+     * get the closest five attractions from user's location
+     * 
+     * @param userName
+     * @return DTO with the five closest attraction information : name and location
+     *         of attraction, user's location and distance between them
+     * @throws InterruptedException
+     * @throws ExecutionException
      */
-
-    @RequestMapping("/testGetNearbyAttractions")
+    @RequestMapping("/getNearbyAttractions")
     public List<ClosestFiveAttractions> getNearbyAttractions(@RequestParam String userName)
             throws InterruptedException, ExecutionException {
         List<ClosestFiveAttractions> closestFiveAttractions = new ArrayList<>();
@@ -68,11 +68,23 @@ public class TourGuideController {
 
     }
 
+    /**
+     * get user's rewards
+     * 
+     * @param userName
+     * @return user's rewards
+     */
     @RequestMapping("/getRewards")
     public List<UserReward> getRewards(@RequestParam String userName) {
         return tourGuideService.getUserRewards(getUser(userName));
     }
 
+    /**
+     * get all deals and show them to user
+     * 
+     * @param userName
+     * @return all deals
+     */
     @RequestMapping("/getTripDeals")
     public List<Provider> getTripDeals(@RequestParam String userName) {
         return tourGuideService.getTripDeals(getUser(userName));

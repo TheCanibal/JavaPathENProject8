@@ -28,7 +28,7 @@ public class RewardsService {
     private int attractionProximityRange = 200;
     private final GpsUtil gpsUtil;
     private final RewardCentral rewardsCentral;
-    ExecutorService executor = Executors.newFixedThreadPool(38);
+    private ExecutorService executor = Executors.newFixedThreadPool(36);
 
     public RewardsService(GpsUtil gpsUtil, RewardCentral rewardCentral) {
         this.gpsUtil = gpsUtil;
@@ -43,6 +43,11 @@ public class RewardsService {
         proximityBuffer = defaultProximityBuffer;
     }
 
+    /**
+     * user win rewards when he has visited an attraction
+     * 
+     * @param user
+     */
     public void calculateRewards(User user) {
         CopyOnWriteArrayList<VisitedLocation> userLocations = user.getVisitedLocations();
         List<Attraction> attractions = gpsUtil.getAttractions();
@@ -60,9 +65,16 @@ public class RewardsService {
         }
     }
 
-    public void calculateRewardsAsync(User user) throws InterruptedException, ExecutionException {
-        Future<?> future = executor.submit(() -> calculateRewards(user));
-        future.get();
+    /**
+     * execute calculate rewards on multiple thread at the same time
+     * 
+     * @param user
+     * @return
+     * @throws InterruptedException
+     * @throws ExecutionException
+     */
+    public Future<?> calculateRewardsAsync(User user) throws InterruptedException, ExecutionException {
+        return executor.submit(() -> calculateRewards(user));
     }
 
     public boolean isWithinAttractionProximity(Attraction attraction, Location location) {

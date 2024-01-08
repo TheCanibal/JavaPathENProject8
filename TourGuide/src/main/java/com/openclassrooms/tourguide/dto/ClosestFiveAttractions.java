@@ -2,6 +2,10 @@ package com.openclassrooms.tourguide.dto;
 
 import java.util.Map;
 
+/**
+ * DTO to format and show the five closest attractions informations
+ */
+
 public class ClosestFiveAttractions {
 
     Map<String, Object> attractionNameLatLong;

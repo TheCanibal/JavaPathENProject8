@@ -2,6 +2,7 @@ package com.openclassrooms.tourguide.tracker;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -58,8 +59,8 @@ public class Tracker extends Thread {
             for (Future<VisitedLocation> task : tasks) {
                 try {
                     task.get();
-                } catch (Exception e) {
-                    logger.error("error");
+                } catch (InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
                 }
             }
             stopWatch.stop();

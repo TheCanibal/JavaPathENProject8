@@ -43,7 +43,7 @@ public class TourGuideService {
     private final TripPricer tripPricer = new TripPricer();
     public final Tracker tracker;
     boolean testMode = true;
-    ExecutorService executor = Executors.newFixedThreadPool(38);
+    private ExecutorService executor = Executors.newFixedThreadPool(50);
 
     public TourGuideService(GpsUtil gpsUtil, RewardsService rewardsService) {
         this.gpsUtil = gpsUtil;
@@ -94,10 +94,22 @@ public class TourGuideService {
         return providers;
     }
 
+    /**
+     * execute trackUserLocation on multiple thread
+     * 
+     * @param user
+     * @return
+     */
     public Future<VisitedLocation> trackUserLocationAsync(User user) {
         return executor.submit(() -> trackUserLocation(user));
     }
 
+    /**
+     * get user's location to add visited location and calculate his rewards
+     * 
+     * @param user
+     * @return visited location
+     */
     public VisitedLocation trackUserLocation(User user) {
         VisitedLocation visitedLocation = gpsUtil.getUserLocation(user.getUserId());
         user.addToVisitedLocations(visitedLocation);
