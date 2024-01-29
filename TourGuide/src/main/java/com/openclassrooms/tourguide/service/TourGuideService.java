@@ -117,6 +117,12 @@ public class TourGuideService {
         return visitedLocation;
     }
 
+    /**
+     * get the five closest attractions from user's position
+     * 
+     * @param visitedLocation
+     * @return list of the five closest attraction
+     */
     public List<Attraction> getNearByAttractions(VisitedLocation visitedLocation) {
         // List of five closest attractions
         List<Attraction> fiveClosestAttractions = new ArrayList<>();
@@ -149,6 +155,12 @@ public class TourGuideService {
         return fiveClosestAttractions;
     }
 
+    /**
+     * get the distances between the five closest attraction and user's position
+     * 
+     * @param visitedLocation
+     * @return list of the distances of the five closest attraction
+     */
     public List<Double> getNearByAttractionsDistances(VisitedLocation visitedLocation) {
         // List of five closest distances
         List<Double> fiveClosestDistances = new ArrayList<>();
@@ -181,6 +193,12 @@ public class TourGuideService {
         return fiveClosestDistances;
     }
 
+    /**
+     * display the five closest attraction with some informations
+     * 
+     * @param visitedLocation
+     * @return informations of the five closest attractions in json format
+     */
     public List<ClosestFiveAttractions> getFiveClosestAttractions(VisitedLocation visitedLocation) {
         // List of five closest attractions
         List<Attraction> fiveClosestAttractions = getNearByAttractions(visitedLocation);

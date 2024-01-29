@@ -8,9 +8,13 @@ import java.util.Map;
 
 public class ClosestFiveAttractions {
 
+    // attraction name and latitude/longitude to display
     Map<String, Object> attractionNameLatLong;
+    // User's latitude/longitude to display
     Map<String, Double> UserLocation;
+    // distance between attraction and user
     Double distanceBetween;
+    // reward points ernable when you visit this attraction
     Integer rewardPoints;
 
     public Map<String, Object> getAttractionNameLatLong() {
